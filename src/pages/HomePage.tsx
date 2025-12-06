@@ -1,7 +1,7 @@
 import { GameStart } from "@/components/GameStart";
 import { useCheckersGame } from "@/hooks/useCheckersGame";
 
-export const HomePage=  () => {
+export function HomePage() {
   const { startAi, startPlayer, isStartingAi, isStartingPlayer } =
     useCheckersGame();
 
@@ -15,4 +15,4 @@ export const HomePage=  () => {
       />
     </div>
   );
-};
+}

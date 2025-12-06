@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { startGameVsAi, startGameVsPlayer } from "@/service/checkersService";
 
-export const useCheckersGame = () => {
+export function useCheckersGame(){
   const navigate = useNavigate();
 
   const startAiMutation = useMutation({
@@ -26,4 +26,4 @@ export const useCheckersGame = () => {
     isStartingAi: startAiMutation.isPending,
     isStartingPlayer: startPlayerMutation.isPending,
   };
-};
+}

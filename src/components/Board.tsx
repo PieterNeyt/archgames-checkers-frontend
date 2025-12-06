@@ -4,7 +4,7 @@ interface Props {
   board: BoardDto;
 }
 
-export const Board = ({ board }: Props) => {
+export function Board({ board }: Props) {
   return (
     <div className="grid grid-cols-8 gap-0 border-4 border-black">
       {board.board.flat().map((square: SquareDto) => (
@@ -29,4 +29,4 @@ export const Board = ({ board }: Props) => {
       ))}
     </div>
   );
-};
+}

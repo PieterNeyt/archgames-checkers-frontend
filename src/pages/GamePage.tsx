@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Board } from "@/components/Board";
 import { useGameData } from "@/hooks/useGameData";
 
-export const GamePage = () => {
+export function GamePage() {
   const { gameId } = useParams<{ gameId: string }>();
   const { data: game, isLoading, error } = useGameData(gameId);
 
@@ -41,4 +41,4 @@ export const GamePage = () => {
       <Board board={game.board} />
     </div>
   );
-};
+}

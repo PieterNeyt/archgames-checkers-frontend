@@ -5,12 +5,12 @@ interface Props {
   isStartingPlayer?: boolean;
 }
 
-export const GameStart = ({
+export function GameStart({
   onStartAi,
   onStartPlayer,
   isStartingAi,
   isStartingPlayer,
-}: Props) => {
+}: Props) {
   return (
     <div className="flex flex-col items-center gap-4 mt-10">
       <h1 className="text-3xl font-bold">Checkers</h1>
@@ -30,4 +30,4 @@ export const GameStart = ({
       </button>
     </div>
   );
-};
+}

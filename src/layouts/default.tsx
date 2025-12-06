@@ -12,7 +12,7 @@ function DefaultLayout({ children }: { children: ReactNode }) {
         starCount={1500}
       />
 
-      {/* Sidebar en main content */}
+      {/*  main content */}
       <div className="flex h-full w-full relative z-10">
         <main className="dark text-foreground flex-1 overflow-auto relative z-10">
           <HeroUIProvider>{children}</HeroUIProvider>
