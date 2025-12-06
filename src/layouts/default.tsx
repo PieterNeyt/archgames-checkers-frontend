@@ -1,29 +1,25 @@
-import { Link } from "@heroui/link";
+import { ReactNode } from "react";
+import { HeroUIProvider } from "@heroui/system";
 
-import { Navbar } from "@/components/navbar";
+import Starfield from "@/layouts/background.tsx";
 
-export default function DefaultLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function DefaultLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="relative flex flex-col h-screen">
-      <Navbar />
-      <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
-        {children}
-      </main>
-      <footer className="w-full flex items-center justify-center py-3">
-        <Link
-          isExternal
-          className="flex items-center gap-1 text-current"
-          href="https://heroui.com"
-          title="heroui.com ijhhhomepage"
-        >
-          <span className="text-default-600">Powered by</span>
-          <p className="text-primary">HeroUI</p>
-        </Link>
-      </footer>
+    <div className="flex h-screen relative overflow-hidden bg-black">
+      <Starfield
+        speedFactor={0.05}
+        starColor={[255, 255, 255]}
+        starCount={1500}
+      />
+
+      {/* Sidebar en main content */}
+      <div className="flex h-full w-full relative z-10">
+        <main className="dark text-foreground flex-1 overflow-auto relative z-10">
+          <HeroUIProvider>{children}</HeroUIProvider>
+        </main>
+      </div>
     </div>
   );
 }
+
+export default DefaultLayout;

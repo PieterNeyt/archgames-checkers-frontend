@@ -1,0 +1,27 @@
+import { PieceDto } from "@/model/pieceDto.ts";
+
+export interface SquareDto {
+  row: number;
+  col: number;
+  color: "LIGHT_BROWN" | "DARK_BROWN";
+  piece?: PieceDto;
+}
+
+export interface BoardDto {
+  board: SquareDto[][];
+}
+
+export interface PlayerDto {
+  displayName: string;
+  color: "WHITE" | "BLACK";
+  type: "HUMAN" | "AI";
+}
+
+export interface GameDto {
+  gameId: string;
+  board: BoardDto;
+  playerWhite: PlayerDto;
+  playerBlack: PlayerDto;
+  currentPlayerColor: "WHITE" | "BLACK";
+  state: "IN_PROGRESS" | "FINISHED";
+}
