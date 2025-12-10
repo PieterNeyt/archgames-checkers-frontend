@@ -17,11 +17,17 @@ export interface PlayerDto {
   type: "HUMAN" | "AI";
 }
 
+export interface PositionDto {
+  row: number;
+  col: number;
+}
+
 export interface GameDto {
   gameId: string;
   board: BoardDto;
   playerWhite: PlayerDto;
   playerBlack: PlayerDto;
   currentPlayerColor: "WHITE" | "BLACK";
-  state: "IN_PROGRESS" | "FINISHED";
+  state: "IN_PROGRESS" | "FINISHED" | "WHITE_WON" | "BLACK_WON" | "DRAW";
+  activePieces: PositionDto[];
 }
