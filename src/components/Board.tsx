@@ -59,7 +59,6 @@ export function Board({
           square.piece && square.piece.color === currentPlayerColor;
         const isActive = isActivePiece(square.row, square.col);
 
-        // Je kan het alleen selecteren als het jouw stuk is en het stuk in de 'activePieces' lijst staat
         const canSelect = isOwnPiece && isActive;
 
         const isInteractive = (canSelect || validTarget) && !highlightSquare;
@@ -133,7 +132,7 @@ export function Board({
                   shadow-lg z-10
                 `}
               >
-                {/* Visual indicator for mandatory move */}
+                {/* Visual indicator  */}
                 {isActive && !selected && !highlightSquare && (
                   <div className="absolute inset-0 rounded-full ring-2 ring-yellow-400 animate-pulse" />
                 )}

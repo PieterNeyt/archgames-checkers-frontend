@@ -108,7 +108,6 @@ export function GamePage() {
     setPreviewBoard(null);
   };
 
-  // Rendering States
   if (isLoading) return <LoadingScreen />;
   if (error) return <ErrorScreen hasError={true} />;
   if (!game) return <ErrorScreen hasError={false} />;
