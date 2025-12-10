@@ -2,17 +2,44 @@ import { GameStart } from "@/components/GameStart";
 import { useCheckersGame } from "@/hooks/useCheckersGame";
 
 export function HomePage() {
-  const { startAi, startPlayer, isStartingAi, isStartingPlayer } =
-    useCheckersGame();
+    const { startAi, startPlayer, isStartingAi, isStartingPlayer } =
+        useCheckersGame();
 
-  return (
-    <div className="flex flex-col items-center mt-10">
-      <GameStart
-        isStartingAi={isStartingAi}
-        isStartingPlayer={isStartingPlayer}
-        onStartAi={startAi}
-        onStartPlayer={startPlayer}
-      />
-    </div>
-  );
+    return (
+        <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100">
+            {/* Bewegende checkerboard achtergrond */}
+            <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 animate-bgShift">
+                {Array.from({ length: 64 }).map((_, idx) => {
+                    const row = Math.floor(idx / 8);
+                    const col = idx % 8;
+                    const isDark = (row + col) % 2 === 1;
+                    return (
+                        <div
+                            key={idx}
+                            className={`w-full h-full ${
+                                isDark ? "bg-amber-700/20" : "bg-amber-100/20"
+                            }`}
+                        />
+                    );
+                })}
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10 flex flex-col items-center gap-6 p-10 bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl border border-amber-200">
+                <h1 className="text-5xl font-extrabold text-amber-900 drop-shadow-lg">
+                    Checkers
+                </h1>
+                <p className="text-gray-700 text-lg text-center max-w-md">
+                    Choose the gamemode and challenge yourselself with an exciting game of checkers!
+                </p>
+                <GameStart
+                    isStartingAi={isStartingAi}
+                    isStartingPlayer={isStartingPlayer}
+                    onStartAi={startAi}
+                    onStartPlayer={startPlayer}
+                />
+            </div>
+
+        </div>
+    );
 }

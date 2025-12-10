@@ -5,14 +5,11 @@ import { Board } from "@/components/Board";
 import { useGameData } from "@/hooks/useGameData";
 import { useGameMoves } from "@/hooks/useGameMoves";
 import { MoveDto } from "@/model/moveDto";
-import { BoardDto } from "@/model/gameDto";
 import { ErrorScreen, LoadingScreen } from "@/components/GameStatusScreens.tsx";
 import { GameHeader } from "@/components/GameHeader.tsx";
 import { GameInfoPanel } from "@/components/GameInfoPanel.tsx";
-import { MoveConfirmationBar } from "@/components/MoveConfirmationBar.tsx";
 import { GameInstructions } from "@/components/GameInstructions.tsx";
 import { GameOverModal } from "@/components/GameOverModal.tsx";
-import { createPreviewBoard } from "@/utils/boardUtils.ts";
 
 export function GamePage() {
   const { gameId } = useParams<{ gameId: string }>();
@@ -26,14 +23,11 @@ export function GamePage() {
     col: number;
   } | null>(null);
   const [validMoves, setValidMoves] = useState<MoveDto[]>([]);
-  const [pendingMove, setPendingMove] = useState<MoveDto | null>(null);
-  const [previewBoard, setPreviewBoard] = useState<BoardDto | null>(null);
   const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const [instructionsOpen, setInstructionsOpen] = useState(false);
 
   // Reset local state when game updates
   useEffect(() => {
-    setPendingMove(null);
-    setPreviewBoard(null);
     setSelectedSquare(null);
     setValidMoves([]);
   }, [game]);
@@ -42,9 +36,9 @@ export function GamePage() {
   useEffect(() => {
     if (game) {
       const isGameOver =
-        game.state === "WHITE_WON" ||
-        game.state === "BLACK_WON" ||
-        game.state === "DRAW";
+          game.state === "WHITE_WON" ||
+          game.state === "BLACK_WON" ||
+          game.state === "DRAW";
 
       if (isGameOver) {
         setShowGameOverModal(true);
@@ -53,18 +47,21 @@ export function GamePage() {
   }, [game]);
 
   const handleSquareClick = async (row: number, col: number) => {
-    if (!game || isMoving || pendingMove) return;
+    if (!game || isMoving) return;
 
     if (selectedSquare) {
       const validMove = validMoves.find(
-        (move) => move.toRow === row && move.toCol === col,
+          (move) => move.toRow === row && move.toCol === col,
       );
 
       if (validMove) {
-        const preview = createPreviewBoard(game.board, validMove);
-
-        setPreviewBoard(preview);
-        setPendingMove(validMove);
+        // Execute move directly
+        executeMove({
+          fromRow: validMove.fromRow,
+          fromCol: validMove.fromCol,
+          toRow: validMove.toRow,
+          toCol: validMove.toCol,
+        });
         setSelectedSquare(null);
         setValidMoves([]);
       } else {
@@ -73,7 +70,6 @@ export function GamePage() {
         if (square.piece && square.piece.color === game.currentPlayerColor) {
           setSelectedSquare({ row, col });
           const moves = await fetchValidMoves(row, col);
-
           setValidMoves(moves);
         } else {
           setSelectedSquare(null);
@@ -86,77 +82,76 @@ export function GamePage() {
       if (square.piece && square.piece.color === game.currentPlayerColor) {
         setSelectedSquare({ row, col });
         const moves = await fetchValidMoves(row, col);
-
         setValidMoves(moves);
       }
     }
   };
 
-  const handleConfirmMove = () => {
-    if (pendingMove) {
-      executeMove({
-        fromRow: pendingMove.fromRow,
-        fromCol: pendingMove.fromCol,
-        toRow: pendingMove.toRow,
-        toCol: pendingMove.toCol,
-      });
-    }
-  };
-
-  const handleCancelMove = () => {
-    setPendingMove(null);
-    setPreviewBoard(null);
-  };
+  const openInstructions = () => setInstructionsOpen(true);
+  const closeInstructions = () => setInstructionsOpen(false);
 
   if (isLoading) return <LoadingScreen />;
   if (error) return <ErrorScreen hasError={true} />;
   if (!game) return <ErrorScreen hasError={false} />;
 
   const isGameOver = ["WHITE_WON", "BLACK_WON", "DRAW"].includes(game.state);
-  const displayBoard = previewBoard || game.board;
+
+  const boardWrapperClasses = `relative flex justify-center w-full max-w-6xl transition-transform duration-300 ${
+      instructionsOpen ? "-translate-x-40" : ""
+  }`;
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-10 px-4 pb-32">
-      <GameHeader />
+      <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-10 px-4 pb-32 relative">
+        <GameHeader />
+        <GameInfoPanel game={game} isGameOver={isGameOver} />
 
-      <GameInfoPanel game={game} isGameOver={isGameOver} />
+        {/* Board Wrapper */}
+        <div className={boardWrapperClasses}>
+          <Board
+              activePieces={game.activePieces}
+              board={game.board}
+              currentPlayerColor={game.currentPlayerColor}
+              highlightSquare={null}
+              isMoving={isMoving}
+              selectedSquare={selectedSquare}
+              validMoves={validMoves}
+              onSquareClick={handleSquareClick}
+          />
 
-      {/* Board Wrapper */}
-      <div className="relative mb-8">
-        <Board
-          activePieces={game.activePieces}
-          board={displayBoard}
-          currentPlayerColor={game.currentPlayerColor}
-          highlightSquare={
-            pendingMove
-              ? { row: pendingMove.fromRow, col: pendingMove.fromCol }
-              : null
-          }
-          isMoving={isMoving}
-          selectedSquare={selectedSquare}
-          validMoves={validMoves}
-          onSquareClick={handleSquareClick}
-        />
+          {/* Open Instructions Button  */}
+          {!instructionsOpen && (
+              <button
+                  className="absolute top-0 -right-0 w-12 h-12 bg-amber-400 text-white font-bold rounded-full shadow-lg flex items-center justify-center text-2xl hover:bg-amber-500 transition"
+                  title="Show Game Instructions"
+                  onClick={openInstructions}
+              >
+                📖
+              </button>
+          )}
+
+          {/* Instructions Panel */}
+          {instructionsOpen && (
+              <div className="absolute top-0 right-[-160px] w-96 h-full bg-white shadow-xl rounded-l-2xl p-6 overflow-auto transition-transform duration-300 animate-slide-in">
+                <button
+                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition text-2xl"
+                    title="Close Instructions"
+                    onClick={closeInstructions}
+                >
+                  ❌
+                </button>
+
+                <GameInstructions currentPlayerColor={game.currentPlayerColor} />
+              </div>
+          )}
+        </div>
+
+        {showGameOverModal && (
+            <GameOverModal
+                game={game}
+                onClose={() => setShowGameOverModal(false)}
+                onHome={() => navigate("/")}
+            />
+        )}
       </div>
-
-      {pendingMove && (
-        <MoveConfirmationBar
-          isMoving={isMoving}
-          pendingMove={pendingMove}
-          onCancel={handleCancelMove}
-          onConfirm={handleConfirmMove}
-        />
-      )}
-
-      <GameInstructions currentPlayerColor={game.currentPlayerColor} />
-
-      {showGameOverModal && (
-        <GameOverModal
-          game={game}
-          onClose={() => setShowGameOverModal(false)}
-          onHome={() => navigate("/")}
-        />
-      )}
-    </div>
   );
 }
