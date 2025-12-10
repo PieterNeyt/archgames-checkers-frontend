@@ -82,6 +82,7 @@ export function GamePage() {
       if (square.piece && square.piece.color === game.currentPlayerColor) {
         setSelectedSquare({ row, col });
         const moves = await fetchValidMoves(row, col);
+
         setValidMoves(moves);
       }
     }
