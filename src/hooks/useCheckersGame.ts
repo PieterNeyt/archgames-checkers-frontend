@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { startGameVsAi, startGameVsPlayer } from "@/service/checkersService";
 
-export function useCheckersGame(){
+export function useCheckersGame() {
   const navigate = useNavigate();
 
   const startAiMutation = useMutation({
