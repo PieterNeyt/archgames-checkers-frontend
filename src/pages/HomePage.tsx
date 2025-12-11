@@ -1,9 +1,12 @@
 import { GameStart } from "@/components/GameStart";
 import { useCheckersGame } from "@/hooks/useCheckersGame";
+import {useParams} from "react-router-dom";
 
 export function HomePage() {
-  const { startAi, startPlayer, isStartingAi, isStartingPlayer } =
-    useCheckersGame();
+    const { sessionId } = useParams();
+
+    const { startAi, startPlayer, isStartingAi, isStartingPlayer } =
+        useCheckersGame(sessionId!);
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100">

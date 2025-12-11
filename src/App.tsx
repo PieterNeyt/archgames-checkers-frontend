@@ -12,7 +12,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <HeroUIProvider>
             <Routes>
-            <Route element={<HomePage />} path="/" />
+            <Route element={<HomePage />} path="/session/:sessionId" />
             <Route element={<GamePage />} path="/game/:gameId" />
           </Routes>
             </HeroUIProvider>
