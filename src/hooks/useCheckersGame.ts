@@ -3,21 +3,17 @@ import { useNavigate } from "react-router-dom";
 
 import { startGameVsAi, startGameVsPlayer } from "@/service/checkersService";
 
-export function useCheckersGame() {
+export function useCheckersGame(sessionId: string) {
   const navigate = useNavigate();
 
   const startAiMutation = useMutation({
-    mutationFn: startGameVsAi,
-    onSuccess: (game) => {
-      navigate(`/game/${game.gameId}`);
-    },
+    mutationFn: () => startGameVsAi(sessionId),
+    onSuccess: (game) => navigate(`/game/${game.gameId}`),
   });
 
   const startPlayerMutation = useMutation({
-    mutationFn: startGameVsPlayer,
-    onSuccess: (game) => {
-      navigate(`/game/${game.gameId}`);
-    },
+    mutationFn: () => startGameVsPlayer(sessionId),
+    onSuccess: (game) => navigate(`/game/${game.gameId}`),
   });
 
   return {
