@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { getValidMoves, makeMove } from "@/service/checkersService";
+import {getValidMoves, makeAiMove, makeMove} from "@/service/checkersService";
 import { MakeMoveRequest } from "@/model/moveDto";
 
 export function useGameMoves(gameId: string | undefined) {
@@ -14,12 +14,19 @@ export function useGameMoves(gameId: string | undefined) {
 
   const makeMoveMutation = useMutation({
     mutationFn: (request: MakeMoveRequest & { gameId: string }) =>
-      makeMove(request.gameId, request),
+        makeMove(request.gameId, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["game", gameId] });
     },
   });
 
+  const makeAiMoveMutation = useMutation({
+    mutationFn: (gameId: string) => makeAiMove(gameId),
+    onSuccess: () => {
+
+      queryClient.invalidateQueries({ queryKey: ["game", gameId] });
+    },
+  });
   const fetchValidMoves = async (row: number, col: number) => {
     if (!gameId) return [];
     return await getValidMoves(gameId, row, col);
@@ -30,10 +37,17 @@ export function useGameMoves(gameId: string | undefined) {
     makeMoveMutation.mutate({ ...request, gameId });
   };
 
+  const executeAiMoveAction = () => {
+    if (!gameId || makeAiMoveMutation.isPending) return;
+    makeAiMoveMutation.mutate(gameId);
+  };
   return {
     fetchValidMoves,
     executeMove: executeMoveAction,
+    executeAiMove: executeAiMoveAction,
     isMoving: makeMoveMutation.isPending,
+    isAiMoving: makeAiMoveMutation.isPending, // Dit is maar tijdelijk pending!
+    isSuccess: makeAiMoveMutation.isSuccess, // Voeg dit toe
     validMovesQuery,
   };
 }

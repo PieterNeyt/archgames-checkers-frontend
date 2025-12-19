@@ -4,15 +4,20 @@ import { GameDto } from "@/model/gameDto.ts";
 import { MakeMoveRequest, MoveDto } from "@/model/moveDto.ts";
 
 export async function startGameVsAi(sessionId: string): Promise<GameDto> {
-  const { data } = await axios.post<GameDto>(`/api/checkers/${sessionId}/start-ai`);
+  const { data } = await axios.post<GameDto>(
+    `/api/checkers/${sessionId}/start-ai`,
+  );
+
   return data;
 }
 
 export async function startGameVsPlayer(sessionId: string): Promise<GameDto> {
-  const { data } = await axios.post<GameDto>(`/api/checkers/${sessionId}/start-player`);
+  const { data } = await axios.post<GameDto>(
+    `/api/checkers/${sessionId}/start-player`,
+  );
+
   return data;
 }
-
 
 export async function getGame(gameId: string): Promise<GameDto> {
   const { data } = await axios.get<GameDto>(`/api/checkers/${gameId}`);
@@ -39,6 +44,15 @@ export async function makeMove(
   const { data } = await axios.post<GameDto>(
     `/api/checkers/${gameId}/move`,
     request,
+  );
+
+  return data;
+}
+export async function makeAiMove(
+    gameId: string
+): Promise<GameDto> {
+  const { data } = await axios.post<GameDto>(
+      `/api/checkers/${gameId}/move/ai`,
   );
 
   return data;
