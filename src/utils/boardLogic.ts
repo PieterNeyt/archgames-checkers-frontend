@@ -15,7 +15,7 @@ export const isActivePiece = (active: PositionDto[], r: number, c: number) =>
 
 export const canSelectPiece = (
   square: SquareDto,
-  currentPlayer: "WHITE" | "BLACK",
+  currentPlayer: "W" | "B",
   active: PositionDto[],
 ) =>
   square.piece &&

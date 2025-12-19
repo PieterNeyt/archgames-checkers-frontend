@@ -13,7 +13,7 @@ interface Props {
   onSquareClick: (row: number, col: number) => void;
   selectedSquare: { row: number; col: number } | null;
   validMoves: MoveDto[];
-  currentPlayerColor: "WHITE" | "BLACK";
+  currentPlayerColor: "W" | "B";
   isMoving: boolean;
   highlightSquare?: { row: number; col: number } | null;
   activePieces: PositionDto[];
@@ -85,7 +85,7 @@ export function Board(props: Props) {
           selected ? "scale-110" : "scale-100",
           canSelect && !highlightSquare ? "hover:scale-105" : "",
           !canSelect && square.piece.color === currentPlayerColor ? "opacity-50 grayscale-[0.5]" : "",
-          square.piece.color === "WHITE" ? "bg-gradient-to-br from-gray-100 to-gray-300 border-4 border-gray-400" : "bg-gradient-to-br from-gray-700 to-gray-900 border-4 border-gray-950",
+          square.piece.color === "W" ? "bg-gradient-to-br from-gray-100 to-gray-300 border-4 border-gray-400" : "bg-gradient-to-br from-gray-700 to-gray-900 border-4 border-gray-950",
         ].join(" ")}
       >
         {active && !selected && !highlightSquare && (
@@ -95,7 +95,7 @@ export function Board(props: Props) {
         {square.piece.type === "KING" && (
           <span
             className={`text-2xl font-bold ${
-              square.piece.color === "WHITE" ? "text-yellow-500" : "text-yellow-300"
+              square.piece.color === "W" ? "text-yellow-500" : "text-yellow-300"
             }`}
           >
             ♔
