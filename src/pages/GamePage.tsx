@@ -36,13 +36,12 @@ export function GamePage() {
   const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
 
-  // 1. Bepaal wat de kleur van de menselijke speler is
   const humanColor = useMemo(() => {
     if (!game) return null;
     if (game.playerWhite.type === "HUMAN") return "WHITE";
     if (game.playerBlack.type === "HUMAN") return "BLACK";
 
-    return "WHITE"; // Fallback
+    return "WHITE";
   }, [game]);
 
   const currentPlayer = useMemo(() => {
@@ -53,13 +52,11 @@ export function GamePage() {
       : game.playerBlack;
   }, [game]);
 
-  // 2. AI Zet trigger: Dit wordt ook direct bij het laden uitgevoerd als Wit = AI
   useEffect(() => {
     if (!game || game.state !== "IN_PROGRESS") return;
 
     const isAiTurn = currentPlayer?.type === "AI";
 
-    // Trigger de AI als het zijn beurt is en er niet al een move bezig is
     if (isAiTurn && !isAiMoving && !isMoving && !isFetching) {
       const timer = setTimeout(() => {
         executeAiMove();
@@ -76,8 +73,6 @@ export function GamePage() {
     executeAiMove,
   ]);
 
-  // 3. Bord omdraaien voor de Zwarte speler
-  // We draaien de rijen om EN de kolommen binnen de rijen voor een 180 graden rotatie
   const displayBoard = useMemo(() => {
     if (!game) return null;
     if (humanColor === "BLACK") {
@@ -106,7 +101,6 @@ export function GamePage() {
   const handleSquareClick = async (row: number, col: number) => {
     if (!game || isMoving || isAiMoving || currentPlayer?.type === "AI") return;
 
-    // EXTRA CHECK: Mag de mens deze kleur wel aanraken?
     const humanColorShort = humanColor === "WHITE" ? "W" : "B";
 
     if (game.currentPlayerColor !== humanColorShort) return;
@@ -130,7 +124,6 @@ export function GamePage() {
       }
     }
 
-    // Selecteren van een eigen stuk
     const square = game.board.board[row][col];
 
     if (square.piece && square.piece.color === humanColorShort) {
@@ -164,9 +157,9 @@ export function GamePage() {
 
           <Board
             activePieces={game.activePieces}
-            board={displayBoard} // We gebruiken het gedraaide bord!
+            board={displayBoard}
             currentPlayerColor={game.currentPlayerColor}
-            humanColor={humanColor ?? "WHITE"} // Nieuwe prop
+            humanColor={humanColor ?? "WHITE"}
             isMoving={isMoving || isAiMoving}
             selectedSquare={selectedSquare}
             validMoves={validMoves}

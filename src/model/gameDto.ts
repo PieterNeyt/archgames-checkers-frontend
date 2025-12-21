@@ -32,9 +32,4 @@ export interface GameDto {
   activePieces: PositionDto[];
 }
 
-export type AiDifficulty =
-    | "BEGINNER"
-    | "EASY"
-    | "MEDIUM"
-    | "HARD"
-    | "EXTREME";
+export type AiDifficulty = | "BEGINNER" | "EASY" | "MEDIUM" | "HARD" | "EXTREME";
