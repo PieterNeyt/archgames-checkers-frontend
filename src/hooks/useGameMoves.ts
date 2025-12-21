@@ -46,8 +46,8 @@ export function useGameMoves(gameId: string | undefined) {
     executeMove: executeMoveAction,
     executeAiMove: executeAiMoveAction,
     isMoving: makeMoveMutation.isPending,
-    isAiMoving: makeAiMoveMutation.isPending, // Dit is maar tijdelijk pending!
-    isSuccess: makeAiMoveMutation.isSuccess, // Voeg dit toe
+    isAiMoving: makeAiMoveMutation.isPending,
+    isSuccess: makeAiMoveMutation.isSuccess,
     validMovesQuery,
   };
 }

@@ -1,15 +1,21 @@
 import axios from "axios";
 
-import { GameDto } from "@/model/gameDto.ts";
+import {AiDifficulty, GameDto} from "@/model/gameDto.ts";
 import { MakeMoveRequest, MoveDto } from "@/model/moveDto.ts";
 
-export async function startGameVsAi(sessionId: string): Promise<GameDto> {
+export async function startGameVsAi(
+    sessionId: string,
+    difficulty: AiDifficulty
+): Promise<GameDto> {
   const { data } = await axios.post<GameDto>(
-    `/api/checkers/${sessionId}/start-ai`,
+      `/api/checkers/${sessionId}/start-ai`,
+      null,
+      { params: { difficulty } }
   );
 
   return data;
 }
+
 
 export async function startGameVsPlayer(sessionId: string): Promise<GameDto> {
   const { data } = await axios.post<GameDto>(
