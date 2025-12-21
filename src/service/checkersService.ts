@@ -44,16 +44,18 @@ export async function getValidMoves(
 }
 
 export async function makeMove(
-  gameId: string,
-  request: MakeMoveRequest,
+    sessionId: string,
+    gameId: string,
+    request: MakeMoveRequest,
 ): Promise<GameDto> {
   const { data } = await axios.post<GameDto>(
-    `/api/checkers/${gameId}/move`,
-    request,
+      `/api/checkers/${sessionId}/${gameId}/move`,
+      request,
   );
 
   return data;
 }
+
 export async function makeAiMove(
     gameId: string
 ): Promise<GameDto> {

@@ -16,7 +16,7 @@ export function GameInfoPanel({ game, isGameOver }: GameInfoPanelProps) {
           <div className="flex items-center justify-center gap-2">
             <div
               className={`w-4 h-4 rounded-full ${
-                game.currentPlayerColor === "WHITE"
+                game.currentPlayerColor === "W"
                   ? "bg-gray-100 border-2 border-gray-800"
                   : "bg-gray-800"
               }`}

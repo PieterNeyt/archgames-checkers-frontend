@@ -2,21 +2,20 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
 import { startGameVsAi, startGameVsPlayer } from "@/service/checkersService";
-import {AiDifficulty} from "@/model/gameDto.ts";
+import { AiDifficulty } from "@/model/gameDto.ts";
 
 export function useCheckersGame(sessionId: string) {
   const navigate = useNavigate();
 
   const startAiMutation = useMutation({
     mutationFn: (difficulty: AiDifficulty) =>
-        startGameVsAi(sessionId, difficulty),
-    onSuccess: (game) => navigate(`/game/${game.gameId}`),
+      startGameVsAi(sessionId, difficulty),
+    onSuccess: (game) => navigate(`/session/${sessionId}/game/${game.gameId}`),
   });
-
 
   const startPlayerMutation = useMutation({
     mutationFn: () => startGameVsPlayer(sessionId),
-    onSuccess: (game) => navigate(`/game/${game.gameId}`),
+    onSuccess: (game) => navigate(`/session/${sessionId}/game/${game.gameId}`),
   });
 
   return {
