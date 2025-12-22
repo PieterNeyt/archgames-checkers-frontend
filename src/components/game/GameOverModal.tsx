@@ -1,6 +1,6 @@
 import { Trophy, X } from "lucide-react";
 
-import { GameDto } from "@/model/gameDto";
+import { GameDto } from "@/model/gameDto.ts";
 
 interface GameOverModalProps {
   game: GameDto;

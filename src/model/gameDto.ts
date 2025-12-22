@@ -27,7 +27,9 @@ export interface GameDto {
   board: BoardDto;
   playerWhite: PlayerDto;
   playerBlack: PlayerDto;
-  currentPlayerColor: "WHITE" | "BLACK";
+  currentPlayerColor: "W" | "B";
   state: "IN_PROGRESS" | "FINISHED" | "WHITE_WON" | "BLACK_WON" | "DRAW";
   activePieces: PositionDto[];
 }
+
+export type AiDifficulty = | "BEGINNER" | "EASY" | "MEDIUM" | "HARD" | "EXTREME";

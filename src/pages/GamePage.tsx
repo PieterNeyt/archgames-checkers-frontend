@@ -1,23 +1,33 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "@heroui/react";
 
-import { Board } from "@/components/Board";
+import { Board } from "@/components/board/Board.tsx";
 import { useGameData } from "@/hooks/useGameData";
 import { useGameMoves } from "@/hooks/useGameMoves";
 import { MoveDto } from "@/model/moveDto";
-import { ErrorScreen, LoadingScreen } from "@/components/GameStatusScreens.tsx";
-import { GameHeader } from "@/components/GameHeader.tsx";
-import { GameInfoPanel } from "@/components/GameInfoPanel.tsx";
-import { GameInstructions } from "@/components/GameInstructions.tsx";
-import { GameOverModal } from "@/components/GameOverModal.tsx";
+import { ErrorScreen, LoadingScreen } from "@/components/game/GameStatusScreens.tsx";
+import { GameHeader } from "@/components/game/GameHeader.tsx";
+import { GameInfoPanel } from "@/components/game/GameInfoPanel.tsx";
+import { GameInstructions } from "@/components/game/GameInstructions.tsx";
+import { GameOverModal } from "@/components/game/GameOverModal.tsx";
+import { AiThinkingOverlay } from "@/components/game/AiThinkingOverlay.tsx";
 
 export function GamePage() {
-  const { gameId } = useParams<{ gameId: string }>();
+  const { sessionId, gameId } = useParams<{
+    sessionId: string;
+    gameId: string;
+  }>();
   const navigate = useNavigate();
-  const { data: game, isLoading, error } = useGameData(gameId);
-  const { fetchValidMoves, executeMove, isMoving } = useGameMoves(gameId);
+  const { data: game, isLoading, isFetching, error } = useGameData(gameId);
 
-  // Local State
+  const { fetchValidMoves, executeMove, executeAiMove, isMoving, isAiMoving } =
+    useGameMoves(sessionId, gameId);
+
+  const handleGoHome = () => {
+    navigate(`/session/${sessionId}`);
+  };
+
   const [selectedSquare, setSelectedSquare] = useState<{
     row: number;
     col: number;
@@ -26,36 +36,81 @@ export function GamePage() {
   const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
 
-  // Reset local state when game updates
+  const humanColor = useMemo(() => {
+    if (!game) return null;
+    if (game.playerWhite.type === "HUMAN") return "WHITE";
+    if (game.playerBlack.type === "HUMAN") return "BLACK";
+
+    return "WHITE";
+  }, [game]);
+
+  const currentPlayer = useMemo(() => {
+    if (!game) return null;
+
+    return game.currentPlayerColor === "W"
+      ? game.playerWhite
+      : game.playerBlack;
+  }, [game]);
+
+  useEffect(() => {
+    if (!game || game.state !== "IN_PROGRESS") return;
+
+    const isAiTurn = currentPlayer?.type === "AI";
+
+    if (isAiTurn && !isAiMoving && !isMoving && !isFetching) {
+      const timer = setTimeout(() => {
+        executeAiMove();
+      }, 600);
+
+      return () => clearTimeout(timer);
+    }
+  }, [
+    currentPlayer,
+    game?.state,
+    isAiMoving,
+    isMoving,
+    isFetching,
+    executeAiMove,
+  ]);
+
+  const displayBoard = useMemo(() => {
+    if (!game) return null;
+    if (humanColor === "BLACK") {
+      const reversedRows = [...game.board.board].reverse();
+
+      return {
+        ...game.board,
+        board: reversedRows.map((row) => [...row].reverse()),
+      };
+    }
+
+    return game.board;
+  }, [game, humanColor]);
+
   useEffect(() => {
     setSelectedSquare(null);
     setValidMoves([]);
   }, [game]);
 
-  // Check for game over state
   useEffect(() => {
-    if (game) {
-      const isGameOver =
-          game.state === "WHITE_WON" ||
-          game.state === "BLACK_WON" ||
-          game.state === "DRAW";
-
-      if (isGameOver) {
-        setShowGameOverModal(true);
-      }
+    if (game && ["WHITE_WON", "BLACK_WON", "DRAW"].includes(game.state)) {
+      setShowGameOverModal(true);
     }
   }, [game]);
 
   const handleSquareClick = async (row: number, col: number) => {
-    if (!game || isMoving) return;
+    if (!game || isMoving || isAiMoving || currentPlayer?.type === "AI") return;
+
+    const humanColorShort = humanColor === "WHITE" ? "W" : "B";
+
+    if (game.currentPlayerColor !== humanColorShort) return;
 
     if (selectedSquare) {
       const validMove = validMoves.find(
-          (move) => move.toRow === row && move.toCol === col,
+        (move) => move.toRow === row && move.toCol === col,
       );
 
       if (validMove) {
-        // Execute move directly
         executeMove({
           fromRow: validMove.fromRow,
           fromCol: validMove.fromCol,
@@ -64,95 +119,88 @@ export function GamePage() {
         });
         setSelectedSquare(null);
         setValidMoves([]);
-      } else {
-        const square = game.board.board[row][col];
 
-        if (square.piece && square.piece.color === game.currentPlayerColor) {
-          setSelectedSquare({ row, col });
-          const moves = await fetchValidMoves(row, col);
-          setValidMoves(moves);
-        } else {
-          setSelectedSquare(null);
-          setValidMoves([]);
-        }
+        return;
       }
+    }
+
+    const square = game.board.board[row][col];
+
+    if (square.piece && square.piece.color === humanColorShort) {
+      setSelectedSquare({ row, col });
+      const moves = await fetchValidMoves(row, col);
+
+      setValidMoves(moves);
     } else {
-      const square = game.board.board[row][col];
-
-      if (square.piece && square.piece.color === game.currentPlayerColor) {
-        setSelectedSquare({ row, col });
-        const moves = await fetchValidMoves(row, col);
-
-        setValidMoves(moves);
-      }
+      setSelectedSquare(null);
+      setValidMoves([]);
     }
   };
 
-  const openInstructions = () => setInstructionsOpen(true);
-  const closeInstructions = () => setInstructionsOpen(false);
-
   if (isLoading) return <LoadingScreen />;
   if (error) return <ErrorScreen hasError={true} />;
-  if (!game) return <ErrorScreen hasError={false} />;
+  if (!game || !displayBoard) return <ErrorScreen hasError={false} />;
 
   const isGameOver = ["WHITE_WON", "BLACK_WON", "DRAW"].includes(game.state);
-
-  const boardWrapperClasses = `relative flex justify-center w-full max-w-6xl transition-transform duration-300 ${
-      instructionsOpen ? "-translate-x-40" : ""
+  const boardWrapperClasses = `relative flex justify-center w-full max-w-6xl transition-transform duration-500 ease-soft-spring ${
+    instructionsOpen ? "-translate-x-40" : ""
   }`;
 
   return (
-      <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-10 px-4 pb-32 relative">
-        <GameHeader />
-        <GameInfoPanel game={game} isGameOver={isGameOver} />
+    <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-10 px-4 pb-32 relative overflow-hidden">
+      <GameHeader />
+      <GameInfoPanel game={game} isGameOver={isGameOver} />
 
-        {/* Board Wrapper */}
-        <div className={boardWrapperClasses}>
+      <div className={boardWrapperClasses}>
+        <div className="relative shadow-2xl rounded-xl overflow-hidden border-8 border-amber-800/20">
+          {isAiMoving && <AiThinkingOverlay />}
+
           <Board
-              activePieces={game.activePieces}
-              board={game.board}
-              currentPlayerColor={game.currentPlayerColor}
-              highlightSquare={null}
-              isMoving={isMoving}
-              selectedSquare={selectedSquare}
-              validMoves={validMoves}
-              onSquareClick={handleSquareClick}
+            activePieces={game.activePieces}
+            board={displayBoard}
+            currentPlayerColor={game.currentPlayerColor}
+            humanColor={humanColor ?? "WHITE"}
+            isMoving={isMoving || isAiMoving}
+            selectedSquare={selectedSquare}
+            validMoves={validMoves}
+            onSquareClick={handleSquareClick}
           />
-
-          {/* Open Instructions Button  */}
-          {!instructionsOpen && (
-              <button
-                  className="absolute top-0 -right-0 w-12 h-12 bg-amber-400 text-white font-bold rounded-full shadow-lg flex items-center justify-center text-2xl hover:bg-amber-500 transition"
-                  title="Show Game Instructions"
-                  onClick={openInstructions}
-              >
-                📖
-              </button>
-          )}
-
-          {/* Instructions Panel */}
-          {instructionsOpen && (
-              <div className="absolute top-0 right-[-160px] w-96 h-full bg-white shadow-xl rounded-l-2xl p-6 overflow-auto transition-transform duration-300 animate-slide-in">
-                <button
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition text-2xl"
-                    title="Close Instructions"
-                    onClick={closeInstructions}
-                >
-                  ❌
-                </button>
-
-                <GameInstructions currentPlayerColor={game.currentPlayerColor} />
-              </div>
-          )}
         </div>
 
-        {showGameOverModal && (
-            <GameOverModal
-                game={game}
-                onClose={() => setShowGameOverModal(false)}
-                onHome={() => navigate("/")}
-            />
+        {!instructionsOpen && (
+          <Button
+            isIconOnly
+            className="absolute top-0 -right-16 bg-amber-500 text-white shadow-lg hover:scale-110 transition-transform"
+            radius="full"
+            size="lg"
+            onPress={() => setInstructionsOpen(true)}
+          >
+            📖
+          </Button>
+        )}
+
+        {instructionsOpen && (
+          <div className="absolute top-0 right-[-160px] w-96 h-full bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl p-6 overflow-auto animate-in slide-in-from-right duration-500">
+            <Button
+              isIconOnly
+              className="absolute top-4 right-4 text-gray-500"
+              variant="light"
+              onPress={() => setInstructionsOpen(false)}
+            >
+              ❌
+            </Button>
+            <GameInstructions />
+          </div>
         )}
       </div>
+
+      {showGameOverModal && (
+        <GameOverModal
+          game={game}
+          onClose={() => setShowGameOverModal(false)}
+          onHome={handleGoHome}
+        />
+      )}
+    </div>
   );
 }

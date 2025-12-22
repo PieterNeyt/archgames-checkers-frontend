@@ -1,18 +1,29 @@
 import axios from "axios";
 
-import { GameDto } from "@/model/gameDto.ts";
+import {AiDifficulty, GameDto} from "@/model/gameDto.ts";
 import { MakeMoveRequest, MoveDto } from "@/model/moveDto.ts";
 
-export async function startGameVsAi(sessionId: string): Promise<GameDto> {
-  const { data } = await axios.post<GameDto>(`/api/checkers/${sessionId}/start-ai`);
+export async function startGameVsAi(
+    sessionId: string,
+    difficulty: AiDifficulty
+): Promise<GameDto> {
+  const { data } = await axios.post<GameDto>(
+      `/api/checkers/${sessionId}/start-ai`,
+      null,
+      { params: { difficulty } }
+  );
+
   return data;
 }
+
 
 export async function startGameVsPlayer(sessionId: string): Promise<GameDto> {
-  const { data } = await axios.post<GameDto>(`/api/checkers/${sessionId}/start-player`);
+  const { data } = await axios.post<GameDto>(
+    `/api/checkers/${sessionId}/start-player`,
+  );
+
   return data;
 }
-
 
 export async function getGame(gameId: string): Promise<GameDto> {
   const { data } = await axios.get<GameDto>(`/api/checkers/${gameId}`);
@@ -33,12 +44,23 @@ export async function getValidMoves(
 }
 
 export async function makeMove(
-  gameId: string,
-  request: MakeMoveRequest,
+    sessionId: string,
+    gameId: string,
+    request: MakeMoveRequest,
 ): Promise<GameDto> {
   const { data } = await axios.post<GameDto>(
-    `/api/checkers/${gameId}/move`,
-    request,
+      `/api/checkers/${sessionId}/${gameId}/move`,
+      request,
+  );
+
+  return data;
+}
+
+export async function makeAiMove(
+    gameId: string
+): Promise<GameDto> {
+  const { data } = await axios.post<GameDto>(
+      `/api/checkers/${gameId}/move/ai`,
   );
 
   return data;
