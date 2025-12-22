@@ -2,16 +2,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@heroui/react";
 
-import { Board } from "@/components/Board";
+import { Board } from "@/components/board/Board.tsx";
 import { useGameData } from "@/hooks/useGameData";
 import { useGameMoves } from "@/hooks/useGameMoves";
 import { MoveDto } from "@/model/moveDto";
-import { ErrorScreen, LoadingScreen } from "@/components/GameStatusScreens.tsx";
-import { GameHeader } from "@/components/GameHeader.tsx";
-import { GameInfoPanel } from "@/components/GameInfoPanel.tsx";
-import { GameInstructions } from "@/components/GameInstructions.tsx";
-import { GameOverModal } from "@/components/GameOverModal.tsx";
-import { AiThinkingOverlay } from "@/components/AiThinkingOverlay";
+import { ErrorScreen, LoadingScreen } from "@/components/game/GameStatusScreens.tsx";
+import { GameHeader } from "@/components/game/GameHeader.tsx";
+import { GameInfoPanel } from "@/components/game/GameInfoPanel.tsx";
+import { GameInstructions } from "@/components/game/GameInstructions.tsx";
+import { GameOverModal } from "@/components/game/GameOverModal.tsx";
+import { AiThinkingOverlay } from "@/components/game/AiThinkingOverlay.tsx";
 
 export function GamePage() {
   const { sessionId, gameId } = useParams<{

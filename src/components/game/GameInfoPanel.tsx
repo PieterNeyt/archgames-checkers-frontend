@@ -1,4 +1,4 @@
-import { GameDto } from "@/model/gameDto";
+import { GameDto } from "@/model/gameDto.ts";
 
 interface GameInfoPanelProps {
   game: GameDto;

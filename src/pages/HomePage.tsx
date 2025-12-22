@@ -1,4 +1,4 @@
-import { GameStart } from "@/components/GameStart";
+import { GameStart } from "@/components/game/GameStart.tsx";
 import { useCheckersGame } from "@/hooks/useCheckersGame";
 import {useParams} from "react-router-dom";
 
