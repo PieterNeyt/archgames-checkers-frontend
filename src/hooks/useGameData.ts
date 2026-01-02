@@ -7,5 +7,7 @@ export function useGameData(gameId: string | undefined) {
     queryKey: ["game", gameId],
     queryFn: () => getGame(gameId!),
     enabled: !!gameId,
+    refetchInterval: 2000,
+    refetchIntervalInBackground: true,
   });
 }

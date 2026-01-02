@@ -45,13 +45,22 @@ export function GamePage() {
     return !game?.playerWhite || !game?.playerBlack;
   }, [game]);
 
-  const humanColor = useMemo(() => {
+  const playerColor = useMemo(() => {
     if (!game || isWaitingForPlayers) return null;
-    if (game.playerWhite.type === "HUMAN") return "WHITE";
-    if (game.playerBlack.type === "HUMAN") return "BLACK";
+
+    if (game.playerWhite && game.playerWhite.type === "HUMAN" && game.playerWhite.sessionId===sessionId) {
+      return "WHITE";
+    }
+    if (game.playerBlack && game.playerBlack.type === "HUMAN" && game.playerBlack.sessionId===sessionId) {
+      return "BLACK";
+    }
+
+    // Fallback voor AI games
+    if (game.playerWhite?.type === "HUMAN") return "WHITE";
+    if (game.playerBlack?.type === "HUMAN") return "BLACK";
 
     return "WHITE";
-  }, [game, isWaitingForPlayers]);
+  }, [game, isWaitingForPlayers, sessionId]);
 
   const currentPlayer = useMemo(() => {
     if (!game || isWaitingForPlayers) return null;
@@ -85,7 +94,7 @@ export function GamePage() {
 
   const displayBoard = useMemo(() => {
     if (!game) return null;
-    if (humanColor === "BLACK") {
+    if (playerColor === "BLACK") {
       const reversedRows = [...game.board.board].reverse();
 
       return {
@@ -95,7 +104,7 @@ export function GamePage() {
     }
 
     return game.board;
-  }, [game, humanColor]);
+  }, [game, playerColor]);
 
   useEffect(() => {
     setSelectedSquare(null);
@@ -111,9 +120,9 @@ export function GamePage() {
   const handleSquareClick = async (row: number, col: number) => {
     if (!game || isMoving || isAiMoving || currentPlayer?.type === "AI" || isWaitingForPlayers) return;
 
-    const humanColorShort = humanColor === "WHITE" ? "W" : "B";
+    const playerColorShort = playerColor === "WHITE" ? "W" : "B";
 
-    if (game.currentPlayerColor !== humanColorShort) return;
+    if (game.currentPlayerColor !== playerColorShort) return;
 
     if (selectedSquare) {
       const validMove = validMoves.find(
@@ -136,7 +145,7 @@ export function GamePage() {
 
     const square = game.board.board[row][col];
 
-    if (square.piece && square.piece.color === humanColorShort) {
+    if (square.piece && square.piece.color === playerColorShort) {
       setSelectedSquare({ row, col });
       const moves = await fetchValidMoves(row, col);
 
@@ -171,7 +180,7 @@ export function GamePage() {
                       activePieces={game.activePieces}
                       board={displayBoard}
                       currentPlayerColor={game.currentPlayerColor}
-                      humanColor={humanColor ?? "WHITE"}
+                      humanColor={playerColor ?? "WHITE"}
                       isMoving={isMoving || isAiMoving}
                       selectedSquare={selectedSquare}
                       validMoves={validMoves}
