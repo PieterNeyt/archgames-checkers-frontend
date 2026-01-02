@@ -28,7 +28,7 @@ export interface GameDto {
   playerWhite: PlayerDto;
   playerBlack: PlayerDto;
   currentPlayerColor: "W" | "B";
-  state: "IN_PROGRESS" | "FINISHED" | "WHITE_WON" | "BLACK_WON" | "DRAW";
+  state: "IN_PROGRESS" | "FINISHED" | "WHITE_WON" | "BLACK_WON" | "DRAW"| "WAITING_FOR_OPPONENT";
   activePieces: PositionDto[];
 }
 
