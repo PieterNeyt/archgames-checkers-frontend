@@ -1,15 +1,29 @@
 import { GameStart } from "@/components/game/GameStart.tsx";
 import { useCheckersGame } from "@/hooks/useCheckersGame";
 import { useParams } from "react-router-dom";
+import { useToast } from "@/hooks/useToast";
+import {Toast} from "@/components/game/Toast.tsx";
+
 
 export function HomePage() {
     const { sessionId, lobbyId } = useParams<{ sessionId: string; lobbyId: string }>();
+    const { toast, showError, hideToast } = useToast();
 
     const { startAi, startPlayer, isStartingAi, isStartingPlayer } =
-        useCheckersGame(sessionId!, lobbyId!);
+        useCheckersGame(sessionId!, lobbyId!, showError);
 
     return (
         <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100">
+            {/* Toast notification */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={hideToast}
+                    duration={toast.duration}
+                />
+            )}
+
             <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 animate-bgShift">
                 {Array.from({ length: 64 }).map((_, idx) => {
                     const row = Math.floor(idx / 8);
