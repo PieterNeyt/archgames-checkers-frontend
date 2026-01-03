@@ -8,7 +8,7 @@ import {
 interface PieceProps {
     square: SquareDto;
     selectedSquare: { row: number; col: number } | null;
-    currentPlayerColor: "W" | "B";
+    currentPlayerColor: "WHITE" | "BLACK";
     activePieces: PositionDto[];
     highlightSquare?: { row: number; col: number } | null;
     humanColor: "WHITE" | "BLACK";
@@ -31,8 +31,8 @@ export function renderPiece(props: PieceProps) {
     const active = isActivePiece(activePieces, square.row, square.col);
 
     const isHumanTurn =
-        (currentPlayerColor === "W" && humanColor === "WHITE") ||
-        (currentPlayerColor === "B" && humanColor === "BLACK");
+        (currentPlayerColor === "WHITE" && humanColor === "WHITE") ||
+        (currentPlayerColor === "BLACK" && humanColor === "BLACK");
 
     return (
         <div
@@ -44,7 +44,7 @@ export function renderPiece(props: PieceProps) {
                 square.piece.color === currentPlayerColor
                     ? "opacity-60 grayscale-[0.3]"
                     : "",
-                square.piece.color === "W"
+                square.piece.color === "WHITE"
                     ? "bg-gradient-to-br from-gray-100 to-gray-300 border-4 border-gray-400"
                     : "bg-gradient-to-br from-gray-700 to-gray-900 border-4 border-gray-950",
             ].join(" ")}
@@ -56,7 +56,7 @@ export function renderPiece(props: PieceProps) {
             {square.piece.type === "KING" && (
                 <span
                     className={`text-2xl font-bold ${
-                        square.piece.color === "W" ? "text-yellow-500" : "text-yellow-300"
+                        square.piece.color === "WHITE" ? "text-yellow-500" : "text-yellow-300"
                     }`}
                 >
           ♔

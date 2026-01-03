@@ -26,8 +26,13 @@ export function GamePage() {
   const navigate = useNavigate();
   const { data: game, isLoading, isFetching, error } = useGameData(gameId);
 
-  const { fetchValidMoves, executeMove, executeAiMove, isMoving, isAiMoving } =
-      useGameMoves(sessionId, gameId);
+  const {
+    fetchValidMoves,
+    executeMove,
+    executeAiMove,
+    isMoving,
+    isAiMoving,
+  } = useGameMoves(sessionId, gameId);
 
   const handleGoHome = () => {
     navigate(`/${lobbyId}/${sessionId}`);
@@ -45,17 +50,24 @@ export function GamePage() {
     return !game?.playerWhite || !game?.playerBlack;
   }, [game]);
 
-  const playerColor = useMemo(() => {
+  const playerColor = useMemo<"WHITE" | "BLACK" | null>(() => {
     if (!game || isWaitingForPlayers) return null;
 
-    if (game.playerWhite && game.playerWhite.type === "HUMAN" && game.playerWhite.sessionId===sessionId) {
+    if (
+        game.playerWhite?.type === "HUMAN" &&
+        game.playerWhite.sessionId === sessionId
+    ) {
       return "WHITE";
     }
-    if (game.playerBlack && game.playerBlack.type === "HUMAN" && game.playerBlack.sessionId===sessionId) {
+
+    if (
+        game.playerBlack?.type === "HUMAN" &&
+        game.playerBlack.sessionId === sessionId
+    ) {
       return "BLACK";
     }
 
-    // Fallback voor AI games
+    // fallback (AI game)
     if (game.playerWhite?.type === "HUMAN") return "WHITE";
     if (game.playerBlack?.type === "HUMAN") return "BLACK";
 
@@ -65,7 +77,7 @@ export function GamePage() {
   const currentPlayer = useMemo(() => {
     if (!game || isWaitingForPlayers) return null;
 
-    return game.currentPlayerColor === "W"
+    return game.currentPlayerColor === "WHITE"
         ? game.playerWhite
         : game.playerBlack;
   }, [game, isWaitingForPlayers]);
@@ -84,7 +96,7 @@ export function GamePage() {
     }
   }, [
     currentPlayer,
-    game?.state,
+    game,
     isAiMoving,
     isMoving,
     isFetching,
@@ -94,9 +106,9 @@ export function GamePage() {
 
   const displayBoard = useMemo(() => {
     if (!game) return null;
+
     if (playerColor === "BLACK") {
       const reversedRows = [...game.board.board].reverse();
-
       return {
         ...game.board,
         board: reversedRows.map((row) => [...row].reverse()),
@@ -118,37 +130,39 @@ export function GamePage() {
   }, [game]);
 
   const handleSquareClick = async (row: number, col: number) => {
-    if (!game || isMoving || isAiMoving || currentPlayer?.type === "AI" || isWaitingForPlayers) return;
+    if (
+        !game ||
+        !playerColor ||
+        isMoving ||
+        isAiMoving ||
+        currentPlayer?.type === "AI" ||
+        isWaitingForPlayers
+    ) {
+      return;
+    }
 
-    const playerColorShort = playerColor === "WHITE" ? "W" : "B";
-
-    if (game.currentPlayerColor !== playerColorShort) return;
+    if (game.currentPlayerColor !== playerColor) return;
 
     if (selectedSquare) {
       const validMove = validMoves.find(
-          (move) => move.toRow === row && move.toCol === col,
+          (move) => move.toRow === row && move.toCol === col
       );
 
       if (validMove) {
-        executeMove({
-          fromRow: validMove.fromRow,
-          fromCol: validMove.fromCol,
-          toRow: validMove.toRow,
-          toCol: validMove.toCol,
-        });
+        executeMove(validMove);
         setSelectedSquare(null);
         setValidMoves([]);
-
         return;
       }
     }
 
     const square = game.board.board[row][col];
 
-    if (square.piece && square.piece.color === playerColorShort) {
+    if (
+        square.piece && square.piece.color === playerColor
+    ) {
       setSelectedSquare({ row, col });
       const moves = await fetchValidMoves(row, col);
-
       setValidMoves(moves);
     } else {
       setSelectedSquare(null);
@@ -161,6 +175,7 @@ export function GamePage() {
   if (!game || !displayBoard) return <ErrorScreen hasError={false} />;
 
   const isGameOver = ["WHITE_WON", "BLACK_WON", "DRAW"].includes(game.state);
+
   const boardWrapperClasses = `relative flex justify-center w-full max-w-6xl transition-transform duration-500 ease-soft-spring ${
       instructionsOpen ? "-translate-x-40" : ""
   }`;
@@ -180,7 +195,7 @@ export function GamePage() {
                       activePieces={game.activePieces}
                       board={displayBoard}
                       currentPlayerColor={game.currentPlayerColor}
-                      humanColor={playerColor ?? "WHITE"}
+                      humanColor={playerColor}
                       isMoving={isMoving || isAiMoving}
                       selectedSquare={selectedSquare}
                       validMoves={validMoves}

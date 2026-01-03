@@ -7,11 +7,11 @@ interface Props {
   onSquareClick: (row: number, col: number) => void;
   selectedSquare: { row: number; col: number } | null;
   validMoves: MoveDto[];
-  currentPlayerColor: "W" | "B";
+  currentPlayerColor: "WHITE" | "BLACK";
   isMoving: boolean;
   highlightSquare?: { row: number; col: number } | null;
   activePieces: PositionDto[];
-  humanColor: "WHITE" | "BLACK";
+  humanColor: "WHITE" | "BLACK" | null;
 }
 
 export function Board(props: Props) {
@@ -26,6 +26,8 @@ export function Board(props: Props) {
     activePieces,
     humanColor,
   } = props;
+
+  if (!humanColor) return null;
 
   return (
       <div className="grid grid-cols-8 gap-0 border-4 border-gray-800 shadow-2xl select-none">

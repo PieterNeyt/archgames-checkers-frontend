@@ -1,4 +1,4 @@
 export interface PieceDto {
-  color: "W" | "B";
+  color: "WHITE" | "BLACK";
   type: "MAN" | "KING";
 }
