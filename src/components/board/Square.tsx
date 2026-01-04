@@ -9,7 +9,7 @@ interface SquareProps {
   onSquareClick: (row: number, col: number) => void;
   selectedSquare: { row: number; col: number } | null;
   validMoves: MoveDto[];
-  currentPlayerColor: "W" | "B";
+  currentPlayerColor: "WHITE" | "BLACK";
   isMoving: boolean;
   highlightSquare?: { row: number; col: number } | null;
   activePieces: PositionDto[];

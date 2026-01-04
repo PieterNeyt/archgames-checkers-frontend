@@ -1,13 +1,29 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
 import { getValidMoves, makeAiMove, makeMove } from "@/service/checkersService";
 import { MakeMoveRequest } from "@/model/moveDto";
 
 export function useGameMoves(
-  sessionId: string | undefined,
-  gameId: string | undefined,
+    sessionId: string | undefined,
+    gameId: string | undefined,
+    onError?: (message: string) => void
 ) {
   const queryClient = useQueryClient();
+
+  const handleError = (error: unknown) => {
+    let errorMessage = "An unexpected error occurred";
+
+    if (axios.isAxiosError(error)) {
+      errorMessage = error.response?.data?.message || error.message;
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    if (onError) {
+      onError(errorMessage);
+    }
+  };
 
   const validMovesQuery = useQuery({
     queryKey: ["validMoves", gameId],
@@ -17,11 +33,12 @@ export function useGameMoves(
 
   const makeMoveMutation = useMutation({
     mutationFn: (
-      request: MakeMoveRequest & { gameId: string; sessionId: string },
+        request: MakeMoveRequest & { gameId: string; sessionId: string },
     ) => makeMove(request.sessionId, request.gameId, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["game", gameId] });
     },
+    onError: handleError,
   });
 
   const makeAiMoveMutation = useMutation({
@@ -29,11 +46,18 @@ export function useGameMoves(
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["game", gameId] });
     },
+    onError: handleError,
   });
+
   const fetchValidMoves = async (row: number, col: number) => {
     if (!gameId) return [];
 
-    return await getValidMoves(gameId, row, col);
+    try {
+      return await getValidMoves(gameId, row, col);
+    } catch (error) {
+      handleError(error);
+      return [];
+    }
   };
 
   const executeMoveAction = (request: MakeMoveRequest) => {

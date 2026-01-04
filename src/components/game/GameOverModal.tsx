@@ -10,14 +10,22 @@ interface GameOverModalProps {
 
 export function GameOverModal({ game, onClose, onHome }: GameOverModalProps) {
   const getGameOverMessage = () => {
-    if (game.state === "WHITE_WON")
-      return `${game.playerWhite.displayName} Wins!`;
-    if (game.state === "BLACK_WON")
-      return `${game.playerBlack.displayName} Wins!`;
-    if (game.state === "DRAW") return "It's a Draw!";
-
-    return "";
+    switch (game.state) {
+      case "WHITE_WON":
+        return game.playerWhite
+            ? `${game.playerWhite.displayName} Wins!`
+            : "White Wins!";
+      case "BLACK_WON":
+        return game.playerBlack
+            ? `${game.playerBlack.displayName} Wins!`
+            : "Black Wins!";
+      case "DRAW":
+        return "It's a Draw!";
+      default:
+        return "";
+    }
   };
+
 
   const isDraw = game.state === "DRAW";
 

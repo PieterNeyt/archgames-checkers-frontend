@@ -12,7 +12,7 @@ interface SquareStylesParams {
   square: SquareDto;
   selectedSquare: { row: number; col: number } | null;
   validMoves: MoveDto[];
-  currentPlayerColor: "W" | "B";
+  currentPlayerColor: "WHITE" | "BLACK";
   isMoving: boolean;
   highlightSquare?: { row: number; col: number } | null;
   activePieces: PositionDto[];
@@ -39,8 +39,8 @@ export function getSquareClasses(params: SquareStylesParams): string {
   const isOwnPiece = square.piece?.color === currentPlayerColor;
 
   const isHumanTurn =
-    (currentPlayerColor === "W" && humanColor === "WHITE") ||
-    (currentPlayerColor === "B" && humanColor === "BLACK");
+    (currentPlayerColor === "WHITE" && humanColor === "WHITE") ||
+    (currentPlayerColor === "BLACK" && humanColor === "BLACK");
 
   const active = isActivePiece(activePieces, row, col);
   const canSelect = canSelectPiece(square, currentPlayerColor, activePieces);

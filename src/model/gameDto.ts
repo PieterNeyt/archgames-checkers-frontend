@@ -15,6 +15,8 @@ export interface PlayerDto {
   displayName: string;
   color: "WHITE" | "BLACK";
   type: "HUMAN" | "AI";
+  profileId: string;
+  sessionId: string;
 }
 
 export interface PositionDto {
@@ -25,11 +27,11 @@ export interface PositionDto {
 export interface GameDto {
   gameId: string;
   board: BoardDto;
-  playerWhite: PlayerDto;
-  playerBlack: PlayerDto;
-  currentPlayerColor: "W" | "B";
-  state: "IN_PROGRESS" | "FINISHED" | "WHITE_WON" | "BLACK_WON" | "DRAW";
+  playerWhite: PlayerDto | null;
+  playerBlack: PlayerDto | null;
+  currentPlayerColor: "WHITE" | "BLACK";
+  state: "IN_PROGRESS" | "FINISHED" | "WHITE_WON" | "BLACK_WON" | "DRAW" | "WAITING_FOR_OPPONENT";
   activePieces: PositionDto[];
 }
 
-export type AiDifficulty = | "BEGINNER" | "EASY" | "MEDIUM" | "HARD" | "EXTREME";
+export type AiDifficulty = "BEGINNER" | "EASY" | "MEDIUM" | "HARD" | "EXTREME";

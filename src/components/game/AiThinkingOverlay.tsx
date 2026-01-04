@@ -20,9 +20,9 @@ export function AiThinkingOverlay() {
                 </div>
                 <div className="text-center">
                     <p className="text-xl font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent">
-                        AI analyseert...
+                        AI is thinking...
                     </p>
-                    <p className="text-xs text-amber-600/70 font-medium">Beste zet berekenen</p>
+                    <p className="text-xs text-amber-600/70 font-medium">Best move calculated</p>
                 </div>
             </Card>
         </div>
